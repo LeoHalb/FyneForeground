@@ -1,0 +1,5 @@
+/.idea/*
+/androidAPK/.idea/*
+/androidAPK/build/*
+/androidAPK/app/src/main/jniLibs/*
+/androidAPK/app/src/main/libs/*
