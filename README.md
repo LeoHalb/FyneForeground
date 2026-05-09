@@ -8,6 +8,12 @@ Android foreground services are the way to go for implementing long-running back
 
 A more elaborate solution could involve using gRPC instead of HTTP, or even facilitating direct function calls from the Android activity to the service, but I couldn't figure out the latter yet...
 
+## What is this for?
+
+Running this app without the HTTP server in the foreground service would only work if you keep the app open and the screen on. Minutes after you would send the app to the background, the Android OS would kill the app.
+
+This is what the foreground service does: it keeps the process alive in the background, allowing the timer to keep ticking and the notification to keep updating, even when the app is not in the foreground.
+
 ## Overview
 
 The app displays a simple stopwatch. On desktop, it runs entirely in Go. On Android, the timer state is kept alive by an Android foreground service (`GoForegroundService`) so the clock keeps ticking even when the app is backgrounded.
