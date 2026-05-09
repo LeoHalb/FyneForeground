@@ -6,7 +6,7 @@ Android foreground services are the way to go for implementing long-running back
 
 ⚠️ For now, there's no prompt to allow the app to send notifications, leaving you with a higher chance that the Android OS will kill the app. You have to manually enable the permission in the settings. ⚠️
 
-A more elaborate solution could involve using gRPC instead of HTTP, or even facilitating direct function calls from the Android activity to the service, vut I couldn't figure out the latter yet...
+A more elaborate solution could involve using gRPC instead of HTTP, or even facilitating direct function calls from the Android activity to the service, but I couldn't figure out the latter yet...
 
 ## Overview
 
