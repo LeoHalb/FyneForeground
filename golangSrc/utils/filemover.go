@@ -63,14 +63,15 @@ func move(src, destDir string) error {
 
 	in, err := os.Open(src)
 	if err != nil {
+		if in != nil {
+			_ = in.Close()
+		}
 		return fmt.Errorf("open %s: %w", src, err)
 	}
-	defer func() {
-		_ = in.Close()
-	}()
 
 	out, err := os.Create(dest)
 	if err != nil {
+		_ = in.Close()
 		return fmt.Errorf("create %s: %w", dest, err)
 	}
 	defer func() {
@@ -78,7 +79,13 @@ func move(src, destDir string) error {
 	}()
 
 	if _, err := io.Copy(out, in); err != nil {
+		_ = in.Close()
 		return fmt.Errorf("copy %s -> %s: %w", src, dest, err)
+	}
+
+	err = in.Close()
+	if err != nil {
+		return fmt.Errorf("closing %s: %w", src, err)
 	}
 
 	return os.Remove(src)

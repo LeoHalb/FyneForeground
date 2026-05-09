@@ -1,3 +1,8 @@
+//go:generate go get golang.org/x/mobile/bind
+//go:generate go install golang.org/x/mobile/cmd/gomobile@latest
+//go:generate go install golang.org/x/mobile/cmd/gobind@latest
+//go:generate gomobile init
+
 //go:generate fyne package -name "Clock Service" -os android -tags "android/arm64"
 
 //go:generate unzip -o Clock_Service.apk -d ./unzippedAPK
