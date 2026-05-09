@@ -1,4 +1,4 @@
-module awesomeProject
+module github.com/leohalb/fyneforeground
 
 go 1.26
 

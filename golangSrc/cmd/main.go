@@ -3,9 +3,10 @@
 //go:generate go install golang.org/x/mobile/cmd/gobind@latest
 //go:generate gomobile init
 
-//go:generate fyne package -name "Clock Service" -os android -tags "android/arm64"
+//go:generate fyne package -name "Fyne Foreground" -os android -tags "android/arm64"
 
-//go:generate unzip -o Clock_Service.apk -d ./unzippedAPK
+//go:generate unzip -o "Fyne_Foreground.apk" -d ./unzippedAPK
+//https://github.com/pxb1988/dex2jar/releases
 //go:generate C:/dex-tools-v2.4/d2j-dex2jar ./unzippedAPK/classes.dex -o ./activity.jar --force
 
 //go:generate go run ../utils/filemover.go ../../androidAPK/app/src/main/libs activity.jar
@@ -14,14 +15,15 @@
 package main
 
 import (
-	"awesomeProject/pkg/goactivity"
-	"awesomeProject/pkg/goservice"
 	_ "embed"
+	"log"
+	"runtime"
+
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/app"
 	"fyne.io/fyne/v2/container"
-	"log"
-	"runtime"
+	"github.com/leohalb/fyneforeground/pkg/goactivity"
+	"github.com/leohalb/fyneforeground/pkg/goservice"
 )
 
 //go:embed Icon.png
@@ -32,7 +34,7 @@ var resourceIconPng = &fyne.StaticResource{
 }
 
 func main() {
-	a := app.NewWithID("com.clock.service")
+	a := app.NewWithID("com.leohalb.fyneforeground")
 	a.SetIcon(resourceIconPng)
 
 	if runtime.GOOS != "android" {

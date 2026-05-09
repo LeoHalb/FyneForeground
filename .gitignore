@@ -4,5 +4,5 @@
 /androidAPK/app/src/main/jniLibs/*
 /androidAPK/app/src/main/libs/*
 /golangSrc/cmd/unzippedAPK/*
-/golangSrc/cmd/Clock_Service.apk
+/golangSrc/cmd/Fyne_Foreground.apk
 /golangSrc/pkg/goservice/goservice-sources.jar

@@ -3,7 +3,7 @@
 //go:generate go install golang.org/x/mobile/cmd/gobind@latest
 //go:generate gomobile init
 
-//go:generate gomobile bind -target=android/arm64 -androidapi 26 -o goservice.aar -ldflags=-checklinkname=0 -v awesomeProject/pkg/goservice
+//go:generate gomobile bind -target=android/arm64 -androidapi 26 -o goservice.aar -ldflags=-checklinkname=0 -v github.com/leohalb/fyneforeground/pkg/goservice
 
 //go:generate go run ../../utils/filemover.go ../../../androidAPK/app/src/main/libs goservice.aar
 
