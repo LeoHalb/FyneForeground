@@ -26,6 +26,9 @@ func Show() fyne.CanvasObject {
 					log.Fatal("error getting elapsed time: ", err)
 				}
 
+				// you will see this in Logcat
+				log.Println("elapsed: ", elapsedTime)
+
 				fyne.Do(func() {
 					label.SetText(elapsedTime)
 				})

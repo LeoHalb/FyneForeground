@@ -1,8 +1,3 @@
-//go:generate go get golang.org/x/mobile/bind
-//go:generate go install golang.org/x/mobile/cmd/gomobile@latest
-//go:generate go install golang.org/x/mobile/cmd/gobind@latest
-//go:generate gomobile init
-
 //go:generate gomobile bind -target=android/arm64 -androidapi 26 -o goservice.aar -ldflags=-checklinkname=0 -v github.com/leohalb/fyneforeground/pkg/goservice
 
 //go:generate go run ../../utils/filemover.go ../../../androidAPK/app/src/main/libs goservice.aar
@@ -60,18 +55,7 @@ func StartForegroundService() error {
 	})
 
 	mux.HandleFunc("/elapsed", func(w http.ResponseWriter, _ *http.Request) {
-		if timestamp.IsZero() {
-			if stoppedTime != 0 {
-				_, _ = io.WriteString(w, stoppedTime.Truncate(time.Second).String())
-				return
-			}
-
-			_, _ = io.WriteString(w, "0s")
-			return
-		}
-
-		elapsed := time.Since(timestamp)
-		_, _ = io.WriteString(w, elapsed.Truncate(time.Second).String())
+		_, _ = io.WriteString(w, getElapsed())
 	})
 
 	webserver = &http.Server{
@@ -97,6 +81,10 @@ func StopForegroundService() error {
 }
 
 func GetNotificationContent() string {
+	return getElapsed()
+}
+
+func getElapsed() string {
 	if timestamp.IsZero() {
 		if stoppedTime != 0 {
 			return stoppedTime.Truncate(time.Second).String()

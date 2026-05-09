@@ -8,6 +8,8 @@ import (
 	"time"
 )
 
+var httpClient = &http.Client{}
+
 func start(started time.Time) error {
 	_, err := executeCall("http://localhost:8080/start?timestamp="+strconv.FormatInt(started.Unix(), 10), false)
 	return err
@@ -38,8 +40,7 @@ func executeCall(url string, readResponseBody bool) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	client := &http.Client{}
-	res, err := client.Do(req)
+	res, err := httpClient.Do(req)
 	if err != nil {
 		return "", err
 	}

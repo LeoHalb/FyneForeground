@@ -12,6 +12,8 @@
 //go:generate go run ../utils/filemover.go ../../androidAPK/app/src/main/libs activity.jar
 //go:generate go run ../utils/filemover.go ../../androidAPK/app/src/main/jniLibs unzippedAPK/lib/*
 
+//go:generate go generate ../pkg/goservice/goservice_http.go
+
 package main
 
 import (
