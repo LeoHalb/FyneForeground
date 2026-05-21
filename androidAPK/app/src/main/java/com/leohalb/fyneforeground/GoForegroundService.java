@@ -1,12 +1,10 @@
 package com.leohalb.fyneforeground;
 
-import android.app.Activity;
 import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
-import android.content.Context;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Handler;
@@ -60,7 +58,7 @@ public class GoForegroundService extends Service {
         Log.d(TAG, "Starting foreground service");
 
         // Build a tap intent that brings the main activity back to front.
-        Intent tapIntent = new Intent(this, MainActivity.class);
+        Intent tapIntent = new Intent(this, org.golang.app.GoNativeActivity.class);
         tapIntent.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
         int piFlags = Build.VERSION.SDK_INT >= Build.VERSION_CODES.M
                 ? PendingIntent.FLAG_IMMUTABLE | PendingIntent.FLAG_UPDATE_CURRENT
@@ -138,7 +136,7 @@ public class GoForegroundService extends Service {
 
     private Notification buildNotification() {
         // Build a tap intent that brings the main activity back to front.
-        Intent tapIntent = new Intent(this, MainActivity.class);
+        Intent tapIntent = new Intent(this, org.golang.app.GoNativeActivity.class);
         tapIntent.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
         int piFlags = Build.VERSION.SDK_INT >= Build.VERSION_CODES.M
                 ? PendingIntent.FLAG_IMMUTABLE | PendingIntent.FLAG_UPDATE_CURRENT

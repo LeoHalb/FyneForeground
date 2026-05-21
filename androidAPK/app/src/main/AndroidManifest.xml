@@ -22,21 +22,17 @@
         android:icon="@mipmap/icon"
         android:label="Fyne Foreground">
         <activity
-            android:name=".MainActivity"
+            android:name="org.golang.app.GoNativeActivity"
             android:exported="true">
+            <meta-data
+                    android:name="android.app.lib_name"
+                    android:value="Fyne_Foreground" />
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
 
-        <activity
-            android:name="org.golang.app.GoNativeActivity"
-            android:exported="true">
-            <meta-data
-                android:name="android.app.lib_name"
-                android:value="Fyne_Foreground" />
-        </activity>
         <service
             android:name="com.leohalb.fyneforeground.GoForegroundService"
             android:enabled="true"

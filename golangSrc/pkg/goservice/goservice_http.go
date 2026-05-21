@@ -45,7 +45,7 @@ func StartForegroundService() error {
 		_, _ = io.WriteString(w, stoppedTime.Truncate(time.Second).String())
 	})
 
-	mux.HandleFunc("/isstopped", func(w http.ResponseWriter, _ *http.Request) {
+	mux.HandleFunc("/isrunning", func(w http.ResponseWriter, _ *http.Request) {
 		if stoppedTime != 0 {
 			_, _ = io.WriteString(w, "true")
 			return

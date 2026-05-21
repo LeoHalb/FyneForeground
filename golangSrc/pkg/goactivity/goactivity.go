@@ -1,18 +1,21 @@
 package goactivity
 
 import (
+	"log"
 	"time"
 
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/container"
+	"fyne.io/fyne/v2/driver"
 	"fyne.io/fyne/v2/widget"
-	"log"
+	"github.com/AndroidGoLab/jni"
+	"runtime"
 )
 
 func Show() fyne.CanvasObject {
-	isStopped, err := isStopped()
+	isRunning, err := isRunning()
 	if err != nil {
-		log.Fatal("error getting isStopped: ", err)
+		log.Println("error getting isRunning: ", err)
 	}
 
 	label := widget.NewLabel("0s")
@@ -20,10 +23,10 @@ func Show() fyne.CanvasObject {
 	ticker := time.NewTicker(time.Second)
 	go func() {
 		for {
-			if isStopped {
+			if isRunning {
 				elapsedTime, err := elapsed()
 				if err != nil {
-					log.Fatal("error getting elapsed time: ", err)
+					log.Println("error getting elapsed time: ", err)
 				}
 
 				// you will see this in Logcat
@@ -39,12 +42,19 @@ func Show() fyne.CanvasObject {
 
 	button := widget.NewButton("Start", nil)
 	button.OnTapped = func() {
-		if !isStopped {
+		if runtime.GOOS == "android" {
+			err := requestPostNotificationPermission()
+			if err != nil {
+				log.Println("error posting notification: ", err)
+			}
+		}
+
+		if !isRunning {
 			ticker.Reset(time.Second)
 
 			err := start(time.Now())
 			if err != nil {
-				log.Print("error starting clock: ", err)
+				log.Println("error starting clock: ", err)
 			}
 
 			fyne.Do(func() {
@@ -57,7 +67,7 @@ func Show() fyne.CanvasObject {
 
 			stoppedTime, err := stop()
 			if err != nil {
-				log.Print("error stopping clock: ", err)
+				log.Println("error stopping clock: ", err)
 			}
 
 			fyne.Do(func() {
@@ -67,10 +77,52 @@ func Show() fyne.CanvasObject {
 			})
 		}
 
-		isStopped = !isStopped
+		isRunning = !isRunning
 	}
 
 	c := container.NewVBox(label, button)
 
 	return c
+}
+
+func requestPostNotificationPermission() error {
+	return driver.RunNative(func(ctx interface{}) error {
+		ac := ctx.(*driver.AndroidContext)
+		env := jni.EnvFromUintptr(ac.Env)
+
+		// Wrap Fyne's context (the Activity) as a jni.Object
+		activity := jni.ObjectFromUintptr(ac.Ctx)
+
+		actCls := env.GetObjectClass(activity)
+
+		reqMid, err := env.GetMethodID(actCls, "requestPermissions", "([Ljava/lang/String;I)V")
+		if err != nil {
+			log.Println("requestPermissions method not found: ", err)
+			return err
+		}
+
+		strCls, err := env.FindClass("java/lang/String")
+		if err != nil {
+			return err
+		}
+
+		perms := []string{"android.permission.POST_NOTIFICATIONS"}
+		arr, err := env.NewObjectArray(int32(len(perms)), strCls, nil)
+		if err != nil {
+			return err
+		}
+
+		for i, p := range perms {
+			jP, err := env.NewStringUTF(p)
+			if err != nil {
+				return err
+			}
+			_ = env.SetObjectArrayElement(arr, int32(i), &jP.Object)
+		}
+
+		_ = env.CallVoidMethod(activity, reqMid,
+			jni.ObjectValue(&arr.Object), jni.IntValue(1))
+
+		return nil
+	})
 }

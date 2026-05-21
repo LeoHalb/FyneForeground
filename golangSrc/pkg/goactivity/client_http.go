@@ -19,8 +19,8 @@ func stop() (string, error) {
 	return executeCall("http://localhost:8080/stop", true)
 }
 
-func isStopped() (bool, error) {
-	s, err := executeCall("http://localhost:8080/isstopped", true)
+func isRunning() (bool, error) {
+	s, err := executeCall("http://localhost:8080/isrunning", true)
 	if err != nil {
 		return false, err
 	}
