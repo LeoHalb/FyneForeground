@@ -4,9 +4,11 @@ A proof of concept for running a [Fyne](https://fyne.io/) UI application alongsi
 
 Android foreground services are the way to go for implementing long-running background tasks on Android, but they require a persistent notification and a Java/Kotlin implementation. This project shows how to wrap a Go HTTP server (`goservice.go`) inside a foreground service (`GoForegroundService.java`) and have a Fyne UI (`goactivity.go`) communicate with it over HTTP, allowing the timer to keep running even when the app is backgrounded.
 
-⚠️ For now, there's no prompt to allow the app to send notifications, leaving you with a higher chance that the Android OS will kill the app. You have to manually enable the permission in the settings. ⚠️
+~~For now, there's no prompt to allow the app to send notifications, leaving you with a higher chance that the Android OS will kill the app. You have to manually enable the permission in the settings.~~
 
 A more elaborate solution could involve using gRPC instead of HTTP, or even facilitating direct function calls from the Android activity to the service, but I couldn't figure out the latter yet...
+
+⚠️ Update: Using [this amazing library](https://github.com/AndroidGoLab/jni) it's possible to request the necessary permissions to post notifications from Go. It also allows for function calls from the activity to the service (and vice versa) without needing to go through HTTP. This is not implemented in the current code, but it's definitely something to explore in the future. I still can't figure direct, native function calls without havíng the app crash over the two conflicting cgo stacks...
 
 ## What is this for?
 
