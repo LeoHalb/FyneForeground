@@ -10,6 +10,8 @@ A more elaborate solution could involve using gRPC instead of HTTP, or even faci
 
 ⚠️ Update: Using [this amazing library](https://github.com/AndroidGoLab/jni) it's possible to request the necessary permissions to post notifications from Go. It also allows for function calls from the activity to the service (and vice versa) without needing to go through HTTP. This is not implemented in the current code, but it's definitely something to explore in the future. I still can't figure direct, native function calls without havíng the app crash over the two conflicting cgo stacks...
 
+Intents and broadcast approach is available [in this branch](https://github.com/LeoHalb/FyneForeground/tree/intents-and-broadcasts), although you'll have to manually replace all "center/dx/jni/internal/GoInvocationHandler" by "com/leohalb/fynforeground/GoInvocationHandler" and all "center.dx.jni.internal.GoInvocationHandler" by "com.leohalb.fyneforeground.GoInvocationHandler" in your local file https://github.com/AndroidGoLab/jni/blob/main/proxy.go
+
 ## What is this for?
 
 Running this app without the HTTP server in the foreground service would only work if you keep the app open and the screen on. Minutes after you would send the app to the background, the Android OS would kill the app.
