@@ -1,3 +1,5 @@
+//go:build http
+
 //go:generate gomobile bind -target=android/arm64 -androidapi 26 -o goservice.aar -ldflags=-checklinkname=0 -v github.com/leohalb/fyneforeground/pkg/goservice
 
 //go:generate go run ../../utils/filemover.go ../../../androidAPK/app/src/main/libs goservice.aar

@@ -12,7 +12,7 @@
 //go:generate go run ../utils/filemover.go ../../androidAPK/app/src/main/libs activity.jar
 //go:generate go run ../utils/filemover.go ../../androidAPK/app/src/main/jniLibs unzippedAPK/lib/*
 
-//go:generate go generate ../pkg/goservice/goservice_http.go
+//go:generate go generate ../pkg/goservice/goservice_intent.go
 
 ////go:generate .\\..\\..\\androidAPK\\gradlew.bat -p ..\..\androidAPK assembleDebug
 ////go:generate adb install ../../androidAPK/app/build/outputs/apk/debug/app-debug.apk

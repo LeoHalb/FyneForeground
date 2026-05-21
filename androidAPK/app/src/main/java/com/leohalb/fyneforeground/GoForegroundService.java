@@ -22,6 +22,12 @@ public class GoForegroundService extends Service {
     /** Intent action used to stop the service. */
     public static final String ACTION_STOP  = "com.leohalb.fyneforeground.FOREGROUND_SERVICE_STOP";
 
+	public static final String ACTION_ELAPSED = "com.leohalb.fyneforeground.ELAPSED_UPDATE";
+	public static final String EXTRA_ELAPSED = "elapsed";
+	public static final String ACTION_START_TIMER = "com.leohalb.fyneforeground.START_TIMER";
+    public static final String ACTION_STOP_TIMER  = "com.leohalb.fyneforeground.STOP_TIMER";
+    public static final String EXTRA_TIMESTAMP    = "timestamp";
+
     /** Extras that carry the user-visible notification content. */
 
     private static final String CHANNEL_ID   = "com.leohalb.fyneforeground.foreground_service_channel";
@@ -56,6 +62,19 @@ public class GoForegroundService extends Service {
         }
 
         Log.d(TAG, "Starting foreground service");
+
+    	if (isServiceRunning) {
+        	String action = intent.getAction();
+        	if (ACTION_START_TIMER.equals(action)) {
+        	    long ts = intent.getIntExtra(EXTRA_TIMESTAMP, 0);
+        	    Goservice.start(ts);
+        	    return START_STICKY;
+        	}
+        	if (ACTION_STOP_TIMER.equals(action)) {
+        	    Goservice.stop(); // return value ignored here; activity gets it via broadcast
+        	    return START_STICKY;
+        	}
+        }
 
         // Build a tap intent that brings the main activity back to front.
         Intent tapIntent = new Intent(this, org.golang.app.GoNativeActivity.class);
@@ -155,6 +174,11 @@ public class GoForegroundService extends Service {
             //noinspection deprecation
             builder = new Notification.Builder(this);
         }
+
+        Intent broadcastIntent = new Intent(ACTION_ELAPSED);
+        broadcastIntent.putExtra(EXTRA_ELAPSED, currentContent);
+        broadcastIntent.setPackage(getPackageName()); // restrict to this app
+        sendBroadcast(broadcastIntent);
 
         currentContent = Goservice.getNotificationContent();
 
