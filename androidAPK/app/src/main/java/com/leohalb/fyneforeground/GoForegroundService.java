@@ -36,6 +36,32 @@ public class GoForegroundService extends Service {
     private boolean isServiceRunning = false;
 
     // -----------------------------------------------------------------------
+    // AIDL Binder — runs methods in the service process (safe for Go runtime B)
+    // -----------------------------------------------------------------------
+
+    private final IGoService.Stub binder = new IGoService.Stub() {
+        @Override
+        public String getElapsed() {
+            return Goservice.getNotificationContent();
+        }
+
+        @Override
+        public void start(long timestamp) {
+            Goservice.start(timestamp);
+        }
+
+        @Override
+        public String stop() {
+            return Goservice.stop();
+        }
+
+        @Override
+        public boolean isRunning() {
+            return Goservice.isRunning();
+        }
+    };
+
+    // -----------------------------------------------------------------------
     // Service lifecycle
     // -----------------------------------------------------------------------
 
@@ -110,8 +136,7 @@ public class GoForegroundService extends Service {
 
     @Override
     public IBinder onBind(Intent intent) {
-        // Not a bound service.
-        return null;
+        return binder;
     }
 
     @Override
@@ -129,6 +154,7 @@ public class GoForegroundService extends Service {
             serverThread.interrupt();
         }
     }
+
 
     // -----------------------------------------------------------------------
     // Notification management

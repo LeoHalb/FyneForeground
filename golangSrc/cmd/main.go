@@ -48,13 +48,13 @@ func main() {
 
 	if runtime.GOOS != "android" {
 		go func() {
-			err := goservice.StartForegroundService()
-			if err != nil {
-				log.Fatal(err)
-			}
+			goservice.StartForegroundService()
 		}()
 	} else {
-		startGoForegroundService()
+		err := startGoForegroundService()
+		if err != nil {
+			log.Fatal(err)
+		}
 	}
 
 	w := a.NewWindow("Clock")
@@ -64,8 +64,8 @@ func main() {
 	w.ShowAndRun()
 }
 
-func startGoForegroundService() {
-	driver.RunNative(func(ctx interface{}) error {
+func startGoForegroundService() error {
+	return driver.RunNative(func(ctx interface{}) error {
 		ac := ctx.(*driver.AndroidContext)
 		env := jni.EnvFromUintptr(ac.Env)
 		activity := jni.ObjectFromUintptr(ac.Ctx)

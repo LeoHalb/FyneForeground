@@ -37,6 +37,7 @@
             android:name="com.leohalb.fyneforeground.GoForegroundService"
             android:enabled="true"
             android:exported="false"
-            android:foregroundServiceType="specialUse" />
+            android:foregroundServiceType="specialUse"
+            android:process=":service" />
     </application>
 </manifest>

@@ -2,6 +2,7 @@ package goactivity
 
 import (
 	"log"
+	"runtime"
 	"time"
 
 	"fyne.io/fyne/v2"
@@ -9,32 +10,66 @@ import (
 	"fyne.io/fyne/v2/driver"
 	"fyne.io/fyne/v2/widget"
 	"github.com/AndroidGoLab/jni"
-	"runtime"
 )
 
 func Show() fyne.CanvasObject {
-	isRunning, err := isRunning()
-	if err != nil {
-		log.Println("error getting isRunning: ", err)
-	}
-
 	label := widget.NewLabel("0s")
+	var currentlyRunning bool
+
+	// On Android, bind to the AIDL service asynchronously after a short delay
+	// to ensure the Fyne native context is ready
+	if runtime.GOOS == "android" {
+		go func() {
+			// Give the window time to initialize the native context
+			time.Sleep(500 * time.Millisecond)
+
+			log.Println("Attempting to bind to service...")
+			if err := bindToService(); err != nil {
+				log.Println("bindToService error:", err)
+				return
+			}
+
+			// Wait for onServiceConnected
+			select {
+			case <-boundCh:
+				log.Println("Service binding confirmed")
+				r, err := aidlIsRunning()
+				if err != nil {
+					log.Println("aidlIsRunning error:", err)
+				} else {
+					currentlyRunning = r
+				}
+			case <-time.After(10 * time.Second):
+				log.Println("timed out waiting for service binding")
+			}
+		}()
+	} else {
+		r, err := isRunning()
+		if err != nil {
+			log.Println("isRunning error:", err)
+		}
+		currentlyRunning = r
+	}
 
 	ticker := time.NewTicker(time.Second)
 	go func() {
 		for {
-			if isRunning {
-				elapsedTime, err := elapsed()
+			if currentlyRunning {
+				var elapsedTime string
+				var err error
+				if runtime.GOOS == "android" {
+					elapsedTime, err = aidlElapsed()
+				} else {
+					elapsedTime, err = elapsed()
+				}
 				if err != nil {
 					log.Println("error getting elapsed time: ", err)
+				} else {
+					log.Println("elapsed: ", elapsedTime)
+					fyne.Do(func() {
+						label.SetText(elapsedTime)
+					})
 				}
-
-				// you will see this in Logcat
-				log.Println("elapsed: ", elapsedTime)
-
-				fyne.Do(func() {
-					label.SetText(elapsedTime)
-				})
 			}
 			<-ticker.C
 		}
@@ -49,12 +84,17 @@ func Show() fyne.CanvasObject {
 			}
 		}
 
-		if !isRunning {
+		if !currentlyRunning {
 			ticker.Reset(time.Second)
 
-			err := start(time.Now())
-			if err != nil {
-				log.Println("error starting clock: ", err)
+			if runtime.GOOS == "android" {
+				if err := aidlStart(time.Now()); err != nil {
+					log.Println("aidlStart error:", err)
+				}
+			} else {
+				if err := start(time.Now()); err != nil {
+					log.Println("error starting clock:", err)
+				}
 			}
 
 			fyne.Do(func() {
@@ -65,9 +105,19 @@ func Show() fyne.CanvasObject {
 		} else {
 			ticker.Stop()
 
-			stoppedTime, err := stop()
-			if err != nil {
-				log.Println("error stopping clock: ", err)
+			var stoppedTime string
+			if runtime.GOOS == "android" {
+				s, err := aidlStop()
+				if err != nil {
+					log.Println("aidlStop error:", err)
+				}
+				stoppedTime = s
+			} else {
+				s, err := stop()
+				if err != nil {
+					log.Println("error stopping clock:", err)
+				}
+				stoppedTime = s
 			}
 
 			fyne.Do(func() {
@@ -77,11 +127,10 @@ func Show() fyne.CanvasObject {
 			})
 		}
 
-		isRunning = !isRunning
+		currentlyRunning = !currentlyRunning
 	}
 
 	c := container.NewVBox(label, button)
-
 	return c
 }
 
